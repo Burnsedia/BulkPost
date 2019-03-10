@@ -21,7 +21,8 @@ class root(Tk):
 class StartPage(tk.Frame):
     def __init__(self, parent, controler):
         tk.Frame.__init__(self,parent)
-        label = tk.Label(self, text="Manu", font= LARGE_FONT)
+      
+        label = tk.Label(self, text="Menu", font= LARGE_FONT)
         label.pack(pady = 10, padx=10)
 
 
