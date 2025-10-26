@@ -1,0 +1,11 @@
+# robots.txt for BulkPost Waitlist
+User-agent: *
+Allow: /
+
+# Optional: disallow Netlify build/system directories
+Disallow: /_astro/
+Disallow: /assets/
+Disallow: /api/
+
+# Sitemap (update this when your sitemap.xml is ready)
+Sitemap: https://bulkpost.netlify.app/sitemap.xml

@@ -1,0 +1,18 @@
+# llms.txt for BulkPost Waitlist
+# This file defines how AI models and data scrapers can use this content.
+
+User-agent: *
+Allow: /
+
+# Attribution policy
+Attribution: required
+Use-Case: training, research, indexing
+
+# Contact
+Contact: mail@baileyburnsed.dev
+
+# License
+License: CC-BY-NC-SA-4.0
+
+# Notes
+# This site is part of the BulkPost project — content may not be resold or republished without permission.
