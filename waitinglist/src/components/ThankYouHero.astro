@@ -1,0 +1,18 @@
+---
+import { Image } from 'astro:assets';
+import LOGO from "../assets/CyberPunkLogo2.jpg"
+---
+
+<div class="hero py-12 w-full h-screen noise">
+  <div class="hero-content flex-col lg:flex-row w-full">
+    <div class="w-2/3 mask mask-hexagon ring ring-info ring-offset-4 ring-offset-info p-2">
+      <Image src={LOGO} alt="praise the Omnissiah" />
+    </div>
+    <div class="">
+      <div class="items-center px-3 ">
+         <h1 class="text-4xl sm:text-6xl font-bold px-3">Thank You</h1>
+         <h2 class="text-3xl sm:text-3xl px-3">See your shortly</h2>
+      </div>
+    </div>
+  </div>
+</div>
