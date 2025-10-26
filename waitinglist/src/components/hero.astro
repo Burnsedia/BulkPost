@@ -28,11 +28,10 @@ import Logo from "../assets/CyberPunkLogo1.jpg";
             type="email"
             name="email"
             placeholder="dev@protonmail.com"
-            class="input input-bordered w-full bg-neutral text-neutral-content"
+            class="input input-bordered w-full text-neutral-content"
             required
           />
         </div>
-
         <!-- Twitter handle -->
         <div>
           <label class="label text-base font-medium">Twitter Handle</label>
@@ -40,26 +39,10 @@ import Logo from "../assets/CyberPunkLogo1.jpg";
             type="text"
             name="twitter"
             placeholder="@yourhandle"
-            class="input input-bordered w-full bg-neutral text-neutral-content"
+            class="input input-bordered w-full text-neutral-content"
             required
           />
         </div>
-
-        <!-- Role radio buttons -->
-        <div>
-          <label class="label text-base font-medium">I’m a:</label>
-          <div class="flex gap-4">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="role" value="indie_dev" class="radio checked:bg-primary" checked />
-              <span>Indie Dev</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="role" value="agency" class="radio checked:bg-primary" />
-              <span>Agency</span>
-            </label>
-          </div>
-        </div>
-
         <!-- Submit -->
         <button type="submit" class="btn btn-primary w-full text-lg">Join the Waitlist</button>
       </form>
