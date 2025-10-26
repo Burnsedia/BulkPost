@@ -11,7 +11,7 @@
 @tailwind utilities;
 
 @plugin "daisyui" {
-  themes: ["light", "dark"];
+  themes: darksynthwave --default, synthwave, light;
 }
 
 @plugin "daisyui/theme" {

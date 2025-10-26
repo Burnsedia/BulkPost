@@ -1,128 +1,80 @@
 ---
 /**
- * BulkPost Footer Component (Astro + Tailwind/DaisyUI)
- * - Dark, minimal, dev-first styling
- * - Social icons (X/Twitter, GitHub, LinkedIn)
- * - Legal + product nav
- * - Optional Netlify newsletter form
- * - JSON-LD Organization markup
+ * FooterBulkPostSimple.astro
+ * Minimal, dev-first footer for a single-page waitlist site.
  */
 
 export interface LinkItem { label: string; href: string; external?: boolean }
 export interface Props {
   brandName?: string;
   tagline?: string;
-  email?: string;
-  addressLine?: string;
-  productLinks?: LinkItem[];
-  companyLinks?: LinkItem[];
-  social?: {
-    twitter?: string;
-    github?: string;
-    linkedin?: string;
-  };
-  showNewsletter?: boolean;
-  formName?: string;
+  email?: string;          // optional; hide if not set
+  addressLine?: string;    // optional; hide if not set
+  productLinks?: LinkItem[]; // defaults to in-page anchors
+  social?: { twitter?: string; github?: string; linkedin?: string };
+  siteUrl?: string;        // for JSON-LD
 }
 
 const year = new Date().getFullYear();
 
 const {
   brandName = "BulkPost",
-  tagline = "Own your stack. Automate your growth. Stay offline.",
-  email = "mail@baileyburnsed.dev",
-  addressLine = "Atlanta, GA",
+  tagline = "Ship code, not tweets.",
+  email,                      // undefined hides the email line
+  addressLine,                // undefined hides the address line
   productLinks = [
-    { label: "Pricing", href: "/#pricing" },
     { label: "Features", href: "/#features" },
-    { label: "Docs", href: "/docs" },
-    { label: "Status", href: "/status" },
-  ],
-  companyLinks = [
-    { label: "About", href: "/about" },
-    { label: "Privacy", href: "/legal/privacy" },
-    { label: "Terms", href: "/legal/terms" },
-    { label: "Contact", href: "/contact" },
+    { label: "How it works", href: "/#how" },
+    { label: "Pricing", href: "/#pricing" },
   ],
   social = {
     twitter: "https://twitter.com/baileyburnsed",
     github: "https://github.com/Burnsedia",
     linkedin: "https://www.linkedin.com/in/bailey-burnsed-50051115a/",
   },
-  showNewsletter = true,
-  formName = "newsletter",
+  siteUrl = "https://your-domain.com",
 } = Astro.props;
 ---
-
-<footer class="bg-base-100 text-base-content border-t border-base-200">
+<footer class="bg-base-100 text-base-content border-top border-t border-base-200">
   <div class="max-w-7xl mx-auto px-6 py-12">
-    <div class="grid gap-10 lg:grid-cols-4">
+    <div class="grid gap-10 lg:grid-cols-3">
       <!-- Brand -->
       <div class="space-y-3">
         <h3 class="text-xl font-bold tracking-tight">
           {brandName}<span class="text-primary">.</span>
         </h3>
-        <p class="opacity-80 text-sm leading-relaxed">
-          {tagline}
-        </p>
-        <p class="text-xs opacity-60">
-          {addressLine}
-        </p>
-        <a href={`mailto:${email}`} class="link link-hover text-sm">{email}</a>
+        <p class="opacity-80 text-sm leading-relaxed">{tagline}</p>
+        {addressLine && <p class="text-xs opacity-60">{addressLine}</p>}
+        {email && <a href={`mailto:${email}`} class="link link-hover text-sm">{email}</a>}
       </div>
-
-      <!-- Product -->
+      <br>
+      <!-- Social -->
       <div>
-        <h4 class="text-sm font-semibold uppercase tracking-wider opacity-70">Product</h4>
-        <ul class="mt-4 space-y-2">
-          {productLinks.map((l) => (
-            <li>
-              <a
-                href={l.href}
-                class="link link-hover"
-                target={l.external ? "_blank" : undefined}
-                rel={l.external ? "noopener noreferrer" : undefined}
-              >
-                {l.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <!-- Company -->
-      <div>
-        <h4 class="text-sm font-semibold uppercase tracking-wider opacity-70">Company</h4>
-        <ul class="mt-4 space-y-2">
-          {companyLinks.map((l) => (
-            <li>
-              <a
-                href={l.href}
-                class="link link-hover"
-                target={l.external ? "_blank" : undefined}
-                rel={l.external ? "noopener noreferrer" : undefined}
-              >
-                {l.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <!-- Newsletter -->
-      <div class={showNewsletter ? "block" : "hidden"}>
-        <h4 class="text-sm font-semibold uppercase tracking-wider opacity-70">Newsletter</h4>
-        <p class="mt-3 text-sm opacity-80">Quiet updates. No fluff.</p>
-        <form name={formName} method="POST" netlify class="mt-4 space-y-3">
-          <input
-            type="email"
-            name="email"
-            required
-            placeholder="dev@protonmail.com"
-            class="input input-bordered w-full bg-neutral text-neutral-content"
-          />
-          <button type="submit" class="btn btn-primary w-full">Subscribe</button>
-        </form>
+        <h4 class="text-sm font-semibold uppercase tracking-wider opacity-70">Social</h4>
+        <div class="mt-4 flex items-center gap-3">
+          {social.twitter && (
+            <a href={social.twitter} target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" aria-label="Twitter / X">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+                <path d="M18.244 2H21l-6.5 7.43L22 22h-6.9l-4.49-5.86L5.3 22H2l7.05-8.05L2 2h7l4.03 5.39L18.244 2Zm-1.21 18h1.92L8.14 4H6.15l10.88 16Z"/>
+              </svg>
+            </a>
+          )}
+          {social.github && (
+            <a href={social.github} target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.22.7-3.9-1.38-3.9-1.38a3.06 3.06 0 0 0-1.28-1.68c-1.05-.72.08-.71.08-.71a2.42 2.42 0 0 1 1.76 1.18 2.45 2.45 0 0 0 3.35.95c.05-.57.3-1.1.7-1.5-2.57-.29-5.27-1.28-5.27-5.7a4.46 4.46 0 0 1 1.18-3.1 4.14 4.14 0 0 1 .11-3.06s.97-.31 3.18 1.18a10.97 10.97 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.43.96.47 2.05.11 3.05a4.45 4.45 0 0 1 1.18 3.1c0 4.43-2.71 5.41-5.28 5.69.46.39.79.95.79 1.92v2.86c0 .31.2.68.8.56A11.5 11.5 0 0 0 12 .5Z"/>
+              </svg>
+            </a>
+          )}
+          {social.linkedin && (
+            <a href={social.linkedin} target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+                <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.5 8.5h4V24h-4V8.5Zm7.5 0h3.83v2.11h.06c.53-1 1.83-2.11 3.76-2.11 4.03 0 4.77 2.65 4.77 6.09V24h-4v-6.82c0-1.63-.03-3.72-2.27-3.72-2.27 0-2.62 1.77-2.62 3.6V24H8V8.5Z"/>
+              </svg>
+            </a>
+          )}
+        </div>
       </div>
     </div>
 
@@ -131,38 +83,7 @@ const {
 
     <!-- Bottom bar -->
     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-      <p class="text-xs opacity-70">
-        © {year} {brandName}. All rights reserved.
-      </p>
-
-      <!-- Social -->
-      <div class="flex items-center gap-4">
-        {social.twitter && (
-          <a href={social.twitter} target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" aria-label="Twitter / X">
-            <!-- X icon -->
-            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
-              <path d="M18.244 2H21l-6.5 7.43L22 22h-6.9l-4.49-5.86L5.3 22H2l7.05-8.05L2 2h7l4.03 5.39L18.244 2Zm-1.21 18h1.92L8.14 4H6.15l10.88 16Z"/>
-            </svg>
-          </a>
-        )}
-        {social.github && (
-          <a href={social.github} target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" aria-label="GitHub">
-            <!-- GitHub icon -->
-            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" clip-rule="evenodd"
-                d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.11.79-.25.79-.56v-2c-3.22.7-3.9-1.38-3.9-1.38a3.06 3.06 0 0 0-1.28-1.68c-1.05-.72.08-.71.08-.71a2.42 2.42 0 0 1 1.76 1.18 2.45 2.45 0 0 0 3.35.95c.05-.57.3-1.1.7-1.5-2.57-.29-5.27-1.28-5.27-5.7a4.46 4.46 0 0 1 1.18-3.1 4.14 4.14 0 0 1 .11-3.06s.97-.31 3.18 1.18a10.97 10.97 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.43.96.47 2.05.11 3.05a4.45 4.45 0 0 1 1.18 3.1c0 4.43-2.71 5.41-5.28 5.69.46.39.79.95.79 1.92v2.86c0 .31.2.68.8.56A11.5 11.5 0 0 0 12 .5Z"/>
-            </svg>
-          </a>
-        )}
-        {social.linkedin && (
-          <a href={social.linkedin} target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" aria-label="LinkedIn">
-            <!-- LinkedIn icon -->
-            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
-              <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.5 8.5h4V24h-4V8.5Zm7.5 0h3.83v2.11h.06c.53-1 1.83-2.11 3.76-2.11 4.03 0 4.77 2.65 4.77 6.09V24h-4v-6.82c0-1.63-.03-3.72-2.27-3.72-2.27 0-2.62 1.77-2.62 3.6V24H8V8.5Z"/>
-            </svg>
-          </a>
-        )}
-      </div>
+      <p class="text-xs opacity-70">© {year} {brandName}. All rights reserved.</p>
     </div>
   </div>
 
@@ -172,9 +93,11 @@ const {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: brandName,
-      url: "https://baileyburnsed.dev",
+      url: siteUrl,
       email,
-      address: { "@type": "PostalAddress", addressLocality: "Atlanta", addressRegion: "GA", addressCountry: "US" },
+      address: addressLine
+        ? { "@type": "PostalAddress", streetAddress: addressLine }
+        : undefined,
       sameAs: [social.twitter, social.github, social.linkedin].filter(Boolean)
     })}
   </script>
