@@ -1,42 +1,73 @@
 ---
-import { Image} from "astro:assets";
+import { Image } from "astro:assets";
 import Logo from "../assets/CyberPunkLogo1.jpg";
 ---
-<div class="hero min-h-screen bg-base-100">
+
+<section id="signup" class="hero min-h-screen bg-base-100 text-base-content">
   <div class="hero-content flex-col-reverse lg:flex-row-reverse gap-12 w-full max-w-7xl px-6 mx-auto">
-    <div class="w-full max-w-md mask mask-hexagon-2" >
-      <Image src={Logo} alt="Deep Roots Co-Op" />
+    <!-- Image -->
+    <div class="w-full max-w-md mask mask-hexagon-2">
+      <Image src={Logo} alt="BulkPost AI Logo" />
     </div>
-    <!-- Text + Form -->
+
+    <!-- Text + Signup form -->
     <div class="w-full max-w-xl space-y-6">
-      <h1 class="text-5xl font-bold text-white">Join the Waitlist</h1>
-      <p class="text-lg text-base-content">
-        Deep Roots Co-Op is launching soon. Be part of the community-owned movement that rewards you for supporting local.
+      <h1 class="text-5xl font-bold text-white">Ship Code, Not Tweets.</h1>
+      <p class="text-lg opacity-80 leading-relaxed">
+        <strong>BulkPost</strong> keeps your Twitter active while you stay in flow.<br />
+        We import your tweets, learn your tone, and post like you — automatically.<br />
+        No dashboards. No burnout. Just quiet, consistent growth.
       </p>
+
+      <!-- Signup Form -->
       <form name="waitlist" method="POST" netlify class="space-y-4">
-        <!-- Email Input -->
+        <!-- Email -->
         <div>
           <label class="label text-base font-medium">Email Address</label>
-          <input type="email" name="email" class="input input-bordered w-full" placeholder="you@example.com" required />
+          <input
+            type="email"
+            name="email"
+            placeholder="dev@protonmail.com"
+            class="input input-bordered w-full bg-neutral text-neutral-content"
+            required
+          />
         </div>
-        <!-- Role Selection -->
+
+        <!-- Twitter handle -->
+        <div>
+          <label class="label text-base font-medium">Twitter Handle</label>
+          <input
+            type="text"
+            name="twitter"
+            placeholder="@yourhandle"
+            class="input input-bordered w-full bg-neutral text-neutral-content"
+            required
+          />
+        </div>
+
+        <!-- Role radio buttons -->
         <div>
           <label class="label text-base font-medium">I’m a:</label>
           <div class="flex gap-4">
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="role" value="consumer" class="radio checked:bg-primary" checked />
-              <span>Consumer</span>
+              <input type="radio" name="role" value="indie_dev" class="radio checked:bg-primary" checked />
+              <span>Indie Dev</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="role" value="business" class="radio checked:bg-primary" />
-              <span>Business Partner</span>
+              <input type="radio" name="role" value="agency" class="radio checked:bg-primary" />
+              <span>Agency</span>
             </label>
           </div>
         </div>
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary w-full text-lg">Notify Me</button>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary w-full text-lg">Join the Waitlist</button>
       </form>
+
+      <p class="text-sm opacity-60">
+        Fully managed posting in your voice. You keep building — we keep you visible.
+      </p>
     </div>
   </div>
-</div>
+</section>
 

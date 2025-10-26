@@ -1,0 +1,119 @@
+---
+/**
+ * NavbarBulkPost.astro
+ * - Responsive navbar with mobile dropdown (DaisyUI)
+ * - Props: brand, logo (optional), links, CTA, sticky, theme toggle
+ */
+
+import { Image } from "astro:assets";
+import Logo from "../assets/CyberPunkLogo1.jpg";
+
+export interface NavLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+export interface Props {
+  brand?: string;
+  logoSrc?: typeof Logo | string;
+  links?: NavLink[];
+  ctaText?: string;
+  ctaHref?: string;
+  sticky?: boolean;
+  showThemeToggle?: boolean;
+}
+
+const {
+  brand = "BulkPost",
+  logoSrc = Logo,
+  links = [
+    { label: "Features", href: "#features" },
+    { label: "Pricing",  href: "#pricing" },
+    { label: "How it works", href: "#how" },
+  ],
+  ctaText = "Join Waitlist",
+  ctaHref = "#signup",
+  sticky = true,
+  showThemeToggle = true,
+} = Astro.props;
+---
+
+<nav class={`navbar ${sticky ? "sticky top-0 z-50" : ""} bg-base-100 border-b border-base-200`}>
+  <div class="navbar-start">
+    <!-- Mobile menu button -->
+    <div class="dropdown">
+      <label tabindex="0" class="btn btn-ghost lg:hidden" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </label>
+      <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-56">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noopener noreferrer" : undefined}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+        <li class="mt-2">
+          <a href={ctaHref} class="btn btn-primary btn-sm">{ctaText}</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Brand -->
+    <a href="/" class="flex items-center gap-2 px-2">
+      {typeof logoSrc === "string"
+        ? <img src={logoSrc} alt={`${brand} Logo`} class="h-8 w-8 rounded-md object-cover" />
+        : <Image src={logoSrc as typeof Logo} alt={`${brand} Logo`} class="h-8 w-8 rounded-md" />
+      }
+      <span class="font-bold tracking-tight text-base-content">{brand}</span>
+      <span class="text-primary">.</span>
+    </a>
+  </div>
+
+  <!-- Desktop links -->
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} class="font-medium" target={l.external ? "_blank" : undefined} rel={l.external ? "noopener noreferrer" : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="navbar-end gap-2">
+    {showThemeToggle && (
+      <button id="themeToggle" class="btn btn-ghost btn-sm" aria-label="Toggle theme">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1Zm0 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10-5a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1ZM5 13a1 1 0 1 1 0-2H3a1 1 0 1 1 0 2h2Zm12.95 6.536a1 1 0 0 1-1.414 0l-1.414-1.415a1 1 0 1 1 1.414-1.414l1.414 1.414a1 1 0 0 1 0 1.415ZM7.879 7.05a1 1 0 0 1-1.414-1.415L7.88 4.222A1 1 0 1 1 9.293 5.636L7.879 7.05Zm10.607-1.414a1 1 0 0 1 0 1.414L17.071 8.465A1 1 0 0 1 15.657 7.05l1.414-1.414a1 1 0 0 1 1.415 0ZM8.465 17.071a1 1 0 0 1-1.415 0L5.636 15.657A1 1 0 1 1 7.05 14.243l1.415 1.414a1 1 0 0 1 0 1.414Z"/>
+        </svg>
+      </button>
+    )}
+
+    <a href={ctaHref} class="btn btn-primary">{ctaText}</a>
+  </div>
+</nav>
+
+<!-- Theme toggle (DaisyUI) -->
+<script is:inline>
+  (function() {
+    const key = "theme";
+    const root = document.documentElement;
+    const saved = localStorage.getItem(key);
+    if (saved) root.setAttribute("data-theme", saved);
+
+    const btn = document.getElementById("themeToggle");
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+      const current = root.getAttribute("data-theme") || "dark";
+      const next = current === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      localStorage.setItem(key, next);
+    });
+  })();
+</script>
