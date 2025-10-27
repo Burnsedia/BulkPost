@@ -37,10 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrapform',  # This is required by Django Classified
-    'sorl.thumbnail',  # This is required by Django Classified
     'rest_framework'
-    'django_classified',
 ]
 
 MIDDLEWARE = [
