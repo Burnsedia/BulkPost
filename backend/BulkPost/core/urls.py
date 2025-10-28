@@ -18,4 +18,10 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Djoser core auth (register, login, etc. — optional if you only use social)
+    path("auth/", include("djoser.urls")),
+    # Djoser JWT auth endpoints
+    path("auth/", include("djoser.urls.jwt")),
+    # Djoser social auth endpoints (OAuth2)
+    path("auth/", include("djoser.social.urls")),
 ]
