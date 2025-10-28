@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'BulkPost.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
