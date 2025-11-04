@@ -24,4 +24,7 @@ urlpatterns = [
     path("auth/", include("djoser.urls.jwt")),
     # Djoser social auth endpoints (OAuth2)
     path("auth/", include("djoser.social.urls")),
+    path("api/", include("api.urls")),
+
+
 ]
