@@ -177,39 +177,3 @@ class PostView(ModelViewSet):  # allows create/schedule + list
 
 
 
-
-r
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-edule
-
-
-
-m_prompt","prompt")
-
-
-
-
-
-
-
-400_BAD_REQUEST)
-
-
-
