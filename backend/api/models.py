@@ -59,9 +59,10 @@ class ProviderCredential(models.Model):
     api_secret = models.CharField(max_length=255, blank=True, default="")
     access_token = models.CharField(max_length=255, blank=True, default="")
     access_token_secret = models.CharField(max_length=255, blank=True, default="")
-    # OpenAI (if you want per-user model keys)
+    # OpenAI-compatible
     openai_api_key = models.CharField(max_length=255, blank=True, default="")
+    base_url = models.CharField(max_length=255, blank=True, default="")      # e.g. http://localhost:11434/v1 for Ollama
+    organization = models.CharField(max_length=128, blank=True, default="")  # optional OpenAI org
 
     class Meta:
         unique_together = ("user", "platform")
-
