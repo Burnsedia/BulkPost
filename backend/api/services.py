@@ -4,6 +4,7 @@ import openai
 import tweepy
 from dotenv import load_dotenv
 from datetime import datetime
+from .models import Prompt, SystemPrompt, Post, Category
 
 load_dotenv()
 
@@ -18,6 +19,8 @@ twitter_client = tweepy.Client(
     access_token_secret=os.getenv("TWITTER_ACCESS_TOKEN_SECRET"),
 )
 
+
+#TODO: refactor to chose a random SystemPrompt Model from the Database
 # selects a random system propmpt
 def choose_system_prompt() -> str:
     """
@@ -26,7 +29,6 @@ def choose_system_prompt() -> str:
     for debugging. Contains zero em dashes.
     """
 
-    # --- PROMPTS (NO EM DASHES ANYWHERE) ---
 
     motivation_prompt = (
         "You are a witty and motivational indie hacker who writes short, structured tweets. "
@@ -113,7 +115,7 @@ def choose_system_prompt() -> str:
 
     return chosen
 
-
+#TODO: refactor to choose a random user prompt from the Database
 def choose_prompt(prompts):
     categories = ["# value", "# engagement", "# authority"]
     category = random.choice(categories)
@@ -145,6 +147,8 @@ def generate_tweet(prompt):
         return prompt[:280]
 
 
+#TODO: make it use twitter oauth to post to other users not just me
+#posts to titter
 def post_tweet(tweet):
     try:
         twitter_client.create_tweet(text=tweet)
@@ -152,7 +156,7 @@ def post_tweet(tweet):
     except Exception as e:
         print("Twitter error:", e)
 
-
+#TODO: refactor this to a django admin command to load all tweets from the prompts.txt and also make a ai call to make prompts 
 def load_prompts():
     with open("prompts.txt") as f:
         return [line.strip() for line in f if line.strip()]

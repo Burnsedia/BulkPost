@@ -3,6 +3,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+#TODO: refactor to be SystemPromptCategory and UserPromptCategory 
+#so I can can have a system to ai gen system anduser propms and randomly secelt them
 class Category(models.TextChoices):
     VALUE = "value", "Value"
     ENGAGEMENT = "engagement", "Engagement"
