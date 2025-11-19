@@ -1,179 +1,170 @@
-# services.py
 import os
-from typing import Optional, Tuple
-
+import random
+import openai
 import tweepy
-from django.utils import timezone
-from pydantic import BaseModel
-from pydantic_ai import Agent
+from dotenv import load_dotenv
+from datetime import datetime
 
-from .models import Post, ProviderCredential, Category
+load_dotenv()
 
+# New client (v1.0+)
+openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# -------- Strategy wrapper (keeps your tweet style + category variations)
-def build_user_prompt(category: Optional[str], base_prompt: str) -> str:
-    """Map your category (string or enum value) to a small prefix and compose the final user prompt."""
-    cat = (category or "").lower()
-
-    def _val(x: str) -> str:
-        # Helper to safely grab TextChoices .value if present
-        return getattr(getattr(Category, x.upper(), ""), "value", x)
-
-    if cat in {_val("value"), "value"}:
-        prefix = "Create a value-driven tip with quick practical steps.\n"
-    elif cat in {_val("engagement"), "engagement"}:
-        prefix = "Ask for opinions or choices to spark replies.\n"
-    elif cat in {_val("authority"), "authority"}:
-        prefix = "Share a hard-won lesson or metric confidently.\n"
-    elif cat in {_val("contrast"), "contrast"}:
-        prefix = "Use contrast (A vs B / Before vs After) to make a clear point.\n"
-    elif cat in {_val("transformation"), "transformation"}:
-        prefix = "Show the transformation: steps from problem to outcome.\n"
-    else:
-        prefix = ""
-
-    return f"{prefix}Prompt: {base_prompt}"
-
-
-SYSTEM_FALLBACK = (
-    "You are a witty, motivational indie hacker.\n"
-    "Tweet format: a punchy one-line insight, then 3–5 short hyphen-led lines.\n"
-    "End with short relevant hashtags like #buildinpublic #indiehackers.\n"
-    "Max 280 chars. No em dashes — only hyphens -."
+# Twitter setup
+twitter_client = tweepy.Client(
+    consumer_key=os.getenv("TWITTER_API_KEY"),
+    consumer_secret=os.getenv("TWITTER_API_SECRET"),
+    access_token=os.getenv("TWITTER_ACCESS_TOKEN"),
+    access_token_secret=os.getenv("TWITTER_ACCESS_TOKEN_SECRET"),
 )
 
-
-class Tweet(BaseModel):
-    text: str
-
-
-def build_agent(
-    system_prompt: str,
-    model_name: str,
-    temperature: float,
-    api_key: Optional[str] = None,
-    base_url: Optional[str] = None,
-    org: Optional[str] = None,
-) -> Agent[Tweet]:
+# selects a random system propmpt
+def choose_system_prompt() -> str:
     """
-    Construct a PydanticAI Agent.
-    For OpenAI-compatible providers, PydanticAI reads OPENAI_* env vars.
-    If you’re BYOK or using Ollama/Groq/etc. behind an OpenAI-compatible /v1,
-    pass api_key/base_url/org here.
+    Randomly selects and returns one of several system prompts
+    for generating different tweet styles. Prints to terminal
+    for debugging. Contains zero em dashes.
     """
-    if api_key:
-        os.environ["OPENAI_API_KEY"] = api_key
-    if base_url:
-        os.environ["OPENAI_BASE_URL"] = base_url
-    if org:
-        os.environ["OPENAI_ORG"] = org
 
-    return Agent[Tweet](
-        model_name,                           # e.g. "openai:gpt-4o-mini", "ollama:llama3.1:8b"
-        instructions=system_prompt or SYSTEM_FALLBACK,
-        temperature=temperature,
-        output_type=Tweet,                    # typed output: result.output is a Tweet
+    # --- PROMPTS (NO EM DASHES ANYWHERE) ---
+
+    motivation_prompt = (
+        "You are a witty and motivational indie hacker who writes short, structured tweets. "
+        "Start with a one line insight, then list 3 to 5 steps or ideas, each starting with a hyphen. "
+        "End with hashtags like #buildinpublic and #indiehacker plus a CTA to follow @baileyburnsed. "
+        "Stay under 280 characters. Never use em dashes; use hyphens only."
     )
 
+    contrast_prompt = (
+        "You are an indie hacker who writes contrast tweets that spark debate. "
+        "Start with a bold comparison such as Most people think X, but Y is the truth. "
+        "Give 3 to 5 bullet points using hyphens. "
+        "Keep it clear, sharp, and under 280 characters. End with hashtags and a CTA to follow @baileyburnsed. "
+        "Never use em dashes; use hyphens only."
+    )
 
-def generate_tweet_text(
-    system_prompt: str,
-    model_name: str,
-    temperature: float,
-    user_prompt: str,
-    openai_key: Optional[str],
-    base_url: Optional[str] = None,
-    org: Optional[str] = None,
-) -> str:
-    """Run the agent synchronously and return a <=280 char tweet."""
-    agent = build_agent(system_prompt, model_name, temperature, openai_key, base_url, org)
-    result = agent.run_sync(f"Write a tweet: {user_prompt}")
+    transformational_prompt = (
+        "You are an authority style indie hacker who writes transformational tweets. "
+        "Begin with a belief shifting statement that reframes how the reader sees a problem. "
+        "Provide 3 to 5 principles using hyphens. "
+        "Keep it wise, concise, and under 280 characters. End with hashtags and a CTA to follow @baileyburnsed. "
+        "Never use em dashes; use hyphens only."
+    )
 
-    # Prefer typed output (Tweet) first
-    text = getattr(getattr(result, "output", None), "text", None)
+    hot_take_prompt = (
+        "You are an indie hacker who writes spicy hot takes crafted for virality. "
+        "Start with a controversial one liner. "
+        "List 3 to 5 blunt bullet points using hyphens. "
+        "Keep it polarizing and under 280 characters. End with hashtags and a CTA to follow @baileyburnsed. "
+        "Never use em dashes; use hyphens only."
+    )
 
-    # Fallbacks for providers that don’t fill typed output
-    if not text:
-        text = getattr(getattr(result, "reply", None), "text", "") or ""
+    argument_driver_prompt = (
+        "You are an indie hacker who writes tweets designed to trigger replies and arguments. "
+        "Start with an opinion that forces people to pick a side. "
+        "Give 3 to 5 sharp points using hyphens. "
+        "Keep it short and aggressive. End with hashtags and a CTA to follow @baileyburnsed. "
+        "Never use em dashes; use hyphens only."
+    )
 
-    text = (text or "").strip().strip('"')
-    return text[:280]
+    shitpost_prompt = (
+        "You are an indie hacker who writes chaotic and funny shitpost tweets. "
+        "Start with an absurd or sarcastic one liner. "
+        "List 3 to 5 chaotic or ironic points using hyphens. "
+        "Keep it playful and under 280 characters. Always end with a CTA to follow @baileyburnsed. "
+        "Never use em dashes; use hyphens only."
+    )
+
+    stoic_prompt = (
+        "You are an indie hacker who writes stoic developer wisdom tweets. "
+        "Open with a calm and philosophical insight about coding or life. "
+        "List 3 to 5 short principles using hyphens. "
+        "Keep it peaceful, reflective, and under 280 characters. End with a CTA to follow @baileyburnsed. "
+        "Never use em dashes; use hyphens only."
+    )
+
+    soft_cta_prompt = (
+        "You are an indie hacker who writes soft CTA tweets that attract leads for a SaaS waiting list. "
+        "Start with a value packed one liner. "
+        "List 3 to 5 helpful bullet points using hyphens. "
+        "End with a soft CTA such as DM me for the waiting list link. "
+        "Stay under 280 characters. Never use em dashes; use hyphens only."
+    )
+    
+    # list of system prompts
+    prompts = [
+        motivation_prompt,
+        contrast_prompt,
+        transformational_prompt,
+        hot_take_prompt,
+        argument_driver_prompt,
+        shitpost_prompt,
+        stoic_prompt,
+        soft_cta_prompt,
+    ]
+
+    # --- SELECT RANDOM ---
+    chosen = random.choice(prompts)
+    #chosen = soft_cta_prompt
+    # --- PRINT TO TERMINAL FOR DEBUGGING ---
+    print("\n=== System Prompt Selected ===")
+    print(chosen)
+    print("=== End Prompt ===\n")
+
+    return chosen
 
 
-def load_openai_key_for(user) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-    """
-    Load OpenAI-compatible creds for the given user.
-    Returns (api_key, base_url, org), falling back to environment variables.
-    Assumes ProviderCredential has platform='openai' and optional fields:
-    - openai_api_key
-    - base_url
-    - organization
-    """
-    cred = ProviderCredential.objects.filter(user=user, platform="openai").first()
-    api_key = (cred.openai_api_key if cred and getattr(cred, "openai_api_key", None) else os.getenv("OPENAI_API_KEY"))
-    base_url = (getattr(cred, "base_url", None) or os.getenv("OPENAI_BASE_URL"))
-    org = (getattr(cred, "organization", None) or os.getenv("OPENAI_ORG"))
-    return api_key, base_url, org
+def choose_prompt(prompts):
+    categories = ["# value", "# engagement", "# authority"]
+    category = random.choice(categories)
+    print("✅ Using:", category) 
+
+    filtered = [p for p in prompts if p.lower().startswith(category)]
+    if not filtered:
+        filtered = prompts  # fallback to all
+    prompt = random.choice(filtered)
+    return prompt.replace(category, "").strip()
 
 
-def post_to_twitter_for(user, text: str) -> tuple[bool, str, str]:
-    """
-    Post a tweet with the user’s BYOK Twitter creds.
-    Expects ProviderCredential(platform='twitter') with:
-      - api_key, api_secret, access_token, access_token_secret
-    Returns (ok, twitter_id, error).
-    """
-    cred = ProviderCredential.objects.filter(user=user, platform="twitter").first()
-    if not cred:
-        return False, "", "Missing Twitter credentials"
+def generate_tweet(prompt):
+    system_prompt = choose_system_prompt()
     try:
-        client = tweepy.Client(
-            consumer_key=cred.api_key,
-            consumer_secret=cred.api_secret,
-            access_token=cred.access_token,
-            access_token_secret=cred.access_token_secret,
+        res = openai_client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Write a tweet: {prompt}"},
+            ],
+            max_tokens=120,
+            temperature=0.9,
         )
-        resp = client.create_tweet(text=text)
-        twid = str(resp.data.get("id"))
-        return True, twid, ""
+        tweet = res.choices[0].message.content.strip().strip('"')
+        return tweet[:280]
     except Exception as e:
-        return False, "", str(e)
+        print("⚠️ OpenAI error:", e)
+        return prompt[:280]
 
 
-def run_post_generation_and_publish(post: Post) -> Post:
-    """Compose → generate via PydanticAI → post to Twitter → update Post record."""
-    # Compose user prompt with strategy wrapper
-    category = post.prompt.category or ""
-    user_prompt = build_user_prompt(category, post.prompt.text)
+def post_tweet(tweet):
+    try:
+        twitter_client.create_tweet(text=tweet)
+        print("✅ Tweeted:", tweet)
+    except Exception as e:
+        print("Twitter error:", e)
 
-    # Pick system params
-    sp = post.system_prompt
-    openai_key, base_url, org = load_openai_key_for(post.user)
 
-    # Generate with PydanticAI
-    tweet_text = generate_tweet_text(
-        sp.content,
-        sp.model_name,
-        sp.temperature,
-        user_prompt,
-        openai_key,
-        base_url,
-        org,
-    )
-    post.text = tweet_text
+def load_prompts():
+    with open("prompts.txt") as f:
+        return [line.strip() for line in f if line.strip()]
 
-    # Post to Twitter
-    ok, twid, err = post_to_twitter_for(post.user, tweet_text)
 
-    if ok:
-        post.status = "posted"
-        post.twitter_id = twid
-        post.posted_at = timezone.now()
-        post.error = ""
-    else:
-        post.status = "failed"
-        post.error = err[:2000]
+def main():
+    prompts = load_prompts()
+    prompt = choose_prompt(prompts)
+    tweet = generate_tweet(prompt)
+    if tweet:
+        post_tweet(tweet)
 
-    post.save(update_fields=["text", "status", "twitter_id", "posted_at", "error"])
-    return post
 
+if __name__ == "__main__":
+    main()
