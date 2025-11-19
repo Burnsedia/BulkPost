@@ -166,5 +166,3 @@ def main():
         post_tweet(tweet)
 
 
-if __name__ == "__main__":
-    main()
