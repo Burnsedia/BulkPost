@@ -2,48 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils.html import format_html
 
-from .models import SystemPrompt, Prompt, Post, ProviderCredential
-
-# ---------- Masked input widgets for secrets
-class SecretInput(forms.PasswordInput):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("render_value", True)
-        super().__init__(*args, **kwargs)
-
-# ---------- ProviderCredential admin (mask secrets, write-only feel)
-class ProviderCredentialForm(forms.ModelForm):
-    class Meta:
-        model = ProviderCredential
-        fields = "__all__"
-        widgets = {
-            "api_key": SecretInput(),
-            "api_secret": SecretInput(),
-            "access_token": SecretInput(),
-            "access_token_secret": SecretInput(),
-            "openai_api_key": SecretInput(),
-        }
-
-class ProviderCredentialAdmin(admin.ModelAdmin):
-    form = ProviderCredentialForm
-    list_display = ("user", "platform", "masked_openai_key", "has_twitter_creds")
-    list_filter = ("platform",)
-    search_fields = ("user__username", "user__email")
-
-    @admin.display(description="OpenAI key")
-    def masked_openai_key(self, obj):
-        v = obj.openai_api_key or ""
-        return ("••••" + v[-4:]) if v else "—"
-
-    @admin.display(description="Twitter creds")
-    def has_twitter_creds(self, obj):
-        ok = all([
-            obj.api_key, obj.api_secret, obj.access_token, obj.access_token_secret
-        ])
-        color = "#16a34a" if ok else "#ef4444"
-        text  = "OK" if ok else "Missing"
-        return format_html('<b style="color:{}">{}</b>', color, text)
-
-admin.site.register(ProviderCredential, ProviderCredentialAdmin)
+from .models import SystemPrompt, Prompt, Post
 
 # ---------- SystemPrompt admin
 class SystemPromptAdmin(admin.ModelAdmin):
