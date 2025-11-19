@@ -13,7 +13,7 @@ from .serializers import SystemPromptSerializer, PromptSerializer, PostSerialize
 
 class SystemPromptView(ModelViewSet):
     serializer_class = SystemPromptSerializer
-    permission_classes = [IsAuthenticated]
+   # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return (
@@ -24,7 +24,7 @@ class SystemPromptView(ModelViewSet):
 
 class PromptView(ModelViewSet):
     serializer_class = PromptSerializer
-    permission_classes = [IsAuthenticated]
+   # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         q = Prompt.objects.filter(user=self.request.user).order_by("-created_at")
@@ -37,7 +37,7 @@ class PromptView(ModelViewSet):
 
 class PostView(ModelViewSet):  # allows create/schedule + list
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+   # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         qs = (
