@@ -1,1 +1,4 @@
-
+- Login with Twitter
+- add create form to allow the user to create edit and delete system prompts
+- add create form to allow the user to create edit and delete prompts
+- add create form to allow the user see weekly analysts 
