@@ -48,21 +48,3 @@ class Post(models.Model):
             models.Index(fields=["status", "scheduled_for"]),
             models.Index(fields=["user", "created_at"]),
         ]
-
-class ProviderCredential(models.Model):
-    """BYOK: per-user, per-platform keys."""
-    PLATFORM_CHOICES = [("twitter", "Twitter"), ("openai", "OpenAI")]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    platform = models.CharField(max_length=24, choices=PLATFORM_CHOICES)
-    # Twitter
-    api_key = models.CharField(max_length=255, blank=True, default="")
-    api_secret = models.CharField(max_length=255, blank=True, default="")
-    access_token = models.CharField(max_length=255, blank=True, default="")
-    access_token_secret = models.CharField(max_length=255, blank=True, default="")
-    # OpenAI-compatible
-    openai_api_key = models.CharField(max_length=255, blank=True, default="")
-    base_url = models.CharField(max_length=255, blank=True, default="")      # e.g. http://localhost:11434/v1 for Ollama
-    organization = models.CharField(max_length=128, blank=True, default="")  # optional OpenAI org
-
-    class Meta:
-        unique_together = ("user", "platform")
