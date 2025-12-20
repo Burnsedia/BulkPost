@@ -103,8 +103,7 @@ Running a hosted SaaS version requires open-sourcing your modifications.
 
 ## 🧩 About
 
-Created by **[Bailey Burnsed](https://baileyburnsed.dev)** —  
-Software Engineer • Indie Hacker • Creator of [Virtue Tracker](https://github.com/Burnsedia) and [Deep Roots Co-op](https://github.com/Burnsedia).
+Created by **[Bailey Burnsed](https://baileyburnsed.dev)** — Software Engineer • Indie Hacker • Creator of [Virtue Tracker](https://github.com/Burnsedia) and [Dracula](https://github.com/Burnsedia).
 
 Follow for updates:  
 🐙 [GitHub](https://github.com/Burnsedia) | 🐦 [Twitter](https://twitter.com/baileyburnsed) | 💼 [LinkedIn](https://www.linkedin.com/in/bailey-burnsed-50051115a/)
