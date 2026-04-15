@@ -127,7 +127,7 @@ def choose_prompt(prompts):
     prompt = random.choice(filtered)
     return prompt.replace(category, "").strip()
 
-
+#TODO: 
 def generate_tweet(prompt):
     system_prompt = choose_system_prompt()
     try:
@@ -149,6 +149,7 @@ def generate_tweet(prompt):
 
 #TODO: make it use twitter oauth to post to other users not just me
 #posts to titter
+#TODO: Refactor to be a tool for Pydantic AI
 def post_tweet(tweet):
     try:
         twitter_client.create_tweet(text=tweet)
