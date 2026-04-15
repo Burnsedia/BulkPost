@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "source_root": ".opencode/agents",
+  "agents": {
+    "agents-orchestrator": {
+      "source_file": ".opencode/agents/agents-orchestrator.md",
+      "base_prompt": "backend/prompts/agents/agents-orchestrator/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/agents-orchestrator/v1.enhanced.md"
+    },
+    "ai-engineer": {
+      "source_file": ".opencode/agents/ai-engineer.md",
+      "base_prompt": "backend/prompts/agents/ai-engineer/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/ai-engineer/v1.enhanced.md"
+    },
+    "brand-guardian": {
+      "source_file": ".opencode/agents/brand-guardian.md",
+      "base_prompt": "backend/prompts/agents/brand-guardian/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/brand-guardian/v1.enhanced.md"
+    },
+    "legal-compliance-checker": {
+      "source_file": ".opencode/agents/legal-compliance-checker.md",
+      "base_prompt": "backend/prompts/agents/legal-compliance-checker/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/legal-compliance-checker/v1.enhanced.md"
+    },
+    "growth-hacker": {
+      "source_file": ".opencode/agents/growth-hacker.md",
+      "base_prompt": "backend/prompts/agents/growth-hacker/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/growth-hacker/v1.enhanced.md"
+    },
+    "experiment-tracker": {
+      "source_file": ".opencode/agents/experiment-tracker.md",
+      "base_prompt": "backend/prompts/agents/experiment-tracker/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/experiment-tracker/v1.enhanced.md"
+    },
+    "analytics-reporter": {
+      "source_file": ".opencode/agents/analytics-reporter.md",
+      "base_prompt": "backend/prompts/agents/analytics-reporter/v1.base.md",
+      "enhanced_overlay": "backend/prompts/agents/analytics-reporter/v1.enhanced.md"
+    }
+  },
+  "shared": {
+    "polite_tone": "backend/prompts/shared/polite_tone_policy.md",
+    "twitter_policy": "backend/prompts/shared/twitter_policy_rules.md",
+    "voice_guardrails": "backend/prompts/shared/voice_guardrails.md",
+    "ab_test_protocol": "backend/prompts/shared/ab_test_protocol.md"
+  }
+}
