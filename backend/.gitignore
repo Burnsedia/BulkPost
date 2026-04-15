@@ -18,5 +18,5 @@ db.sqlite3
 **/migrations/
 !**/migrations/__init__.py
 *.pyc
-__pycache__/
+**/__pycache__/
 db.sqlite3
