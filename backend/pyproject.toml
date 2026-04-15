@@ -11,7 +11,7 @@ dependencies = [
     "charset-normalizer==3.4.4",
     "cryptography==46.0.3",
     "defusedxml==0.7.1",
-    "django==5.2.8",
+    "django==5.2.13",
     "django-filter==25.2",
     "djangorestframework==3.16.1",
     "djangorestframework-simplejwt==5.5.1",
