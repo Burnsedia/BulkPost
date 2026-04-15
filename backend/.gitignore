@@ -1,0 +1,7 @@
+# Django migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# Python cache
+*.pyc
+__pycache__/
