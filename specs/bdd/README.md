@@ -3,10 +3,10 @@
 This folder contains behavior-driven scenarios for the CRM + CMS MVP.
 
 Scope:
-- Content lifecycle (draft to published)
+- Autonomous content lifecycle (generated to published)
 - Engagement lifecycle (discovery to posted reply)
 - Policy and safety controls
-- API authentication and user scoping
+- Setup and go onboarding
 
 How to use:
 - Use each scenario during implementation as a behavior contract.
@@ -17,4 +17,4 @@ Files:
 - `01-content-lifecycle.md`
 - `02-engagement-lifecycle.md`
 - `03-policy-and-safety.md`
-- `04-api-auth-and-scoping.md`
+- `04-onboarding-and-sync.md`

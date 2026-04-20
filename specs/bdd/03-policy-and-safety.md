@@ -46,16 +46,15 @@ And actions are logged as skipped due to kill switch
 Given Content Agent generated text
 When Safety Agent returns should_post=false
 Then no publish action occurs
-And content remains in review or rejected state
+And content status becomes blocked or rejected
 And block reason is stored in logs
 ```
 
-## Scenario 6: High risk requires manual review
+## Scenario 6: High risk auto-blocks in fully autonomous mode
 
 ```gherkin
-Given GrowthPolicy.review_high_risk_only is true
-And Safety Agent returns high risk score
-When user has not approved the item
-Then status does not advance to scheduled publish
-And user review is required
+Given Safety Agent returns high risk score
+When autonomous mode is enabled
+Then status does not advance to queued publish
+And action is logged as blocked by policy
 ```
