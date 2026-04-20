@@ -1,19 +1,20 @@
 # Content Agent Spec
 
 ## Role
-Generates social content drafts aligned with campaign goals and tone constraints.
+Generates social content candidates aligned with campaign goals and tone constraints.
 
 ## Phase
 MVP
 
 ## Objective
-Produce high-quality publishable draft candidates for queueing.
+Produce high-quality publishable content candidates for autonomous queueing.
 
 ## Inputs
 - Prompt/SystemPrompt variant
 - Campaign context (goal, audience)
 - Recent posts summary (for dedupe)
 - Brand/tone constraints
+- StyleProfile (voice, hook, CTA, phrase constraints)
 
 ## Output Contract
 ```json
@@ -21,6 +22,8 @@ Produce high-quality publishable draft candidates for queueing.
   "body": "string",
   "category": "value | engagement | authority | contrast | transformation",
   "hooks": ["string"],
+  "style_profile_version": 0,
+  "style_match_score": 0.0,
   "estimated_risk": 0.0,
   "rationale": "string"
 }
@@ -29,13 +32,15 @@ Produce high-quality publishable draft candidates for queueing.
 ## Rules
 1. Avoid repeating recent phrasing.
 2. Keep concise, platform-ready language.
-3. Return one primary draft per run.
+3. Return one primary content candidate per run.
 4. Include rationale for traceability.
+5. Conform to StyleProfile constraints and avoid banned phrases.
 
 ## Tools
 - `get_prompt_variants(user_id)`
 - `get_campaign_context(campaign_id)`
 - `get_recent_posts(user_id, limit)`
+- `get_style_profile(user_id)`
 - `retrieve_knowledge(query)`
 
 ## Safety Constraints
@@ -45,7 +50,9 @@ Produce high-quality publishable draft candidates for queueing.
 
 ## Failure Handling
 - If prompt context missing: fallback to default prompt profile.
-- If generation quality low: request retry once, else return low-confidence draft.
+- If style profile is stale or missing: fallback to conservative house style and include low confidence.
+- If generation quality is low: request retry once, else return low-confidence candidate.
 
 ## Acceptance Criteria
-- Draft non-empty, categorized, and policy-compatible for safety review.
+- Candidate content is non-empty, categorized, and policy-compatible for safety checks.
+- Output includes style profile trace fields (`style_profile_version`, `style_match_score`).

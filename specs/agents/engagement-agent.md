@@ -20,6 +20,7 @@ Generate meaningful engagement and create qualified leads.
 - Existing interaction history
 - Pending reply capacity
 - Recent interaction types (reply/mention/follow)
+- StyleProfile for reply voice consistency
 
 ## Output Contract
 ```json
@@ -43,12 +44,13 @@ Generate meaningful engagement and create qualified leads.
 ## Internal Subflows
 1. Discovery: generate and run queries.
 2. Qualification: score relevance and lead potential.
-3. Reply writing: draft contextual response.
+3. Reply writing: draft contextual response in the user's style.
 
 ## Tools
 - `search_twitter(query)`
 - `get_user_profile(handle)`
 - `get_past_interactions(handle)`
+- `get_style_profile(user_id)`
 - `retrieve_knowledge(query)`
 
 ## Safety Constraints

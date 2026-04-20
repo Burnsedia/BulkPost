@@ -6,6 +6,7 @@
 - `engagement-agent.md`
 - `safety-agent.md`
 - `sales-agent.md`
+- `style-profiler-agent.md`
 
 ## Phase 2
 - `optimization-agent.md`
