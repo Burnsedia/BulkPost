@@ -1,22 +1,14 @@
-# Django migrations (all apps inside backend/)
-**/migrations/
-!**/migrations/__init__.py
-
-# Python cache
+# -----------------------------
+# Python
+# -----------------------------
 *.pyc
 __pycache__/
 
-# SQLite (local dev DB)
+**/backend/**/migrations/*
+!**/backend/**/migrations/__init__.py
+
 db.sqlite3
 
-# Logs
 *.log
 
-# Env files
 .env
-
-**/migrations/
-!**/migrations/__init__.py
-*.pyc
-**/__pycache__/
-db.sqlite3
