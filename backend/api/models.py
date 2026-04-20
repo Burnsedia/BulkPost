@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.utils import timezon
+from django.utils import timezone
 
 class Category(models.TextChoices):
     VALUE = "value", "Value"

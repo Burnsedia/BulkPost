@@ -35,10 +35,19 @@ When Autopilot evaluates the next action
 Then output.action is "engage"
 ```
 
-## Scenario 5: Return structured decision contract
+## Scenario 5: Prefer DM offer when qualified candidates are waiting
+```gherkin
+Given post and reply priorities are satisfied
+And qualified DM candidates are available
+And DM policy limits allow sending
+When Autopilot evaluates the next action
+Then output.action is "dm_offer"
+```
+
+## Scenario 6: Return structured decision contract
 ```gherkin
 Given Autopilot evaluates any valid state
 When it returns a decision
 Then output has fields action, reason, priority, cooldown_minutes
-And action is one of post, engage, skip
+And action is one of post, engage, dm_offer, skip
 ```

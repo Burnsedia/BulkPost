@@ -2,6 +2,10 @@
 
 Goal: discover relevant posts, qualify leads, generate replies, and track activity.
 
+Qualification rule for DM eligibility:
+- Only `reply`, `mention`, and `follow` interactions count.
+- Likes are excluded from DM qualification.
+
 ## Scenario 1: Discover candidate reply targets
 
 ```gherkin
@@ -20,6 +24,7 @@ When qualification score is above threshold
 Then the ReplyTarget status becomes "queued"
 And a Lead is created or updated for the source handle
 And Lead.status is "qualified"
+And Lead.score is evaluated for DM eligibility threshold
 ```
 
 ## Scenario 3: Generate reply draft for qualified target
@@ -60,4 +65,13 @@ Given a ReplyTarget already exists for user and source_tweet_id
 When discovery sees the same source_tweet_id again
 Then no duplicate ReplyTarget is created
 And the existing target may be updated in place
+```
+
+## Scenario 7: Exclude likes from DM qualification
+
+```gherkin
+Given a lead only liked a post without reply, mention, or follow
+When lead qualification runs
+Then the lead is not marked DM eligible
+And no offer DM is queued
 ```

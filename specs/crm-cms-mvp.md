@@ -3,8 +3,8 @@
 ## 1) Purpose
 
 Build a focused MVP that combines:
-- CMS for social content operations (draft -> review -> schedule -> publish -> measure)
-- CRM for social lead operations (discover -> qualify -> engage -> track)
+- CMS for social content operations (draft -> schedule -> publish -> measure)
+- CRM for social lead operations (discover -> qualify -> engage -> offer -> track)
 
 Primary channel for MVP: **X/Twitter only**.
 
@@ -16,12 +16,11 @@ Primary channel for MVP: **X/Twitter only**.
 - Automate engagement replies to relevant targets.
 - Capture and track leads generated from social interactions.
 - Measure performance and improve prompts/strategy over time.
-- Keep humans in control with optional review gates and kill switch.
+- Operate in setup-and-go mode with autonomous posting, replies, and qualified DM offers.
 
 ### Non-Goals (MVP)
 - Multi-platform publishing (LinkedIn/Instagram/etc.)
 - Advanced optimization (bandits, autonomous strategy loops)
-- Full sales automation/DM funnel
 - Team roles/permissions beyond single owner/admin
 
 ---
@@ -32,27 +31,25 @@ Primary channel for MVP: **X/Twitter only**.
 - Authenticated single-user workspace
 - Content pipeline:
   - Draft generation
-  - Optional review/approval
   - Scheduling queue
   - Publish and error handling
 - CRM pipeline:
-  - Lead capture from engagement discovery
+  - Lead capture from reply/mention/follow interactions
   - Lead qualification and scoring
-  - Contact + activity timeline
+  - Contact + activity timeline + offer funnel tracking
 - Agent loop:
-  - Autopilot, Content, Engagement, Safety
+  - Autopilot, Content, Engagement, Safety, Sales
 - Basic analytics:
   - Post/reply counts
   - Engagement metrics snapshots
-  - Lead funnel counts
+  - Lead and offer funnel counts
 - Policy controls:
-  - Daily limits, min intervals, kill switch
+  - Daily limits, min intervals, kill switch, DM cooldown/suppression
 
 ### Excluded
 - Multi-tenant organization support
 - Complex role-based access control
 - Multi-platform adapters
-- AI-driven sales DM automation
 
 ---
 
@@ -61,8 +58,8 @@ Primary channel for MVP: **X/Twitter only**.
 ### High-level flow
 
 Autopilot Agent
--> decides action (post | engage | skip)
--> subagent output (content/reply + safety result)
+-> decides action (post | engage | dm_offer | skip)
+-> subagent output (content/reply/offer + safety result)
 -> Execution services perform API calls + persistence
 -> Django stores state + metrics
 -> Dashboard reads analytics
@@ -108,9 +105,8 @@ Autopilot Agent
 - source_prompt (FK Prompt nullable)
 - title (optional)
 - body
-- status (idea | draft | in_review | approved | scheduled | published | rejected)
+- status (idea | draft | scheduled | published | rejected)
 - risk_score (float)
-- approved_by_user (bool)
 - scheduled_for (datetime nullable)
 - linked_post (FK Post nullable)
 - created_at, updated_at
@@ -120,11 +116,14 @@ Autopilot Agent
 - user (FK)
 - source_channel (default: x)
 - source_handle
-- source_tweet_id (nullable)
+- source_tweet_id (nullable, origin inbound post/tweet)
 - status (new | qualified | engaged | converted | disqualified)
 - score (0-100)
 - owner (FK user)
 - notes (text)
+- last_dm_at (datetime nullable)
+- cooldown_until (datetime nullable)
+- do_not_contact (bool default false)
 - created_at, updated_at
 
 #### Contact
@@ -142,12 +141,33 @@ Autopilot Agent
 - id
 - user (FK)
 - lead (FK)
-- type (reply_sent | dm_sent | note | status_change)
+- type (reply_sent | dm_sent | note | status_change | offer_sent | offer_outcome)
 - content (text)
 - source_post_id (FK Post nullable)
 - source_reply_id (FK Reply nullable)
 - happened_at (datetime)
 - created_at
+
+#### Offer
+- id
+- user (FK)
+- lead (FK)
+- channel (x_dm)
+- template_name
+- message_text
+- lead_magnet_link
+- app_link
+- status (queued | sent | replied | interested | won | lost | suppressed)
+- sent_at (datetime nullable)
+- created_at, updated_at
+
+#### OfferEvent
+- id
+- user (FK)
+- offer (FK)
+- event_type (sent | replied | clicked | interested | won | lost | suppressed)
+- detail (text nullable)
+- happened_at (datetime)
 
 ---
 
@@ -165,7 +185,7 @@ Input:
 - Pending reply targets
 
 Output:
-- action: post | engage | skip
+- action: post | engage | dm_offer | skip
 - reason: str
 
 ### Content Agent
@@ -185,6 +205,10 @@ Output:
 ### Engagement Agent
 Role:
 - Find targets, qualify lead opportunities, draft replies.
+
+Qualification policy:
+- Only `reply`, `mention`, and `follow` interactions count for DM qualification.
+- Likes are tracked for analytics but excluded from DM qualification.
 
 Sub-steps:
 1. Discovery (search queries + candidate tweets)
@@ -206,18 +230,33 @@ Checks:
 - Policy violations
 - Unsafe claims/phrasing
 - Frequency/duplicate constraints
+- DM suppression and cooldown constraints
 
 Output:
 - risk_score
 - should_post (bool)
 - reason
 
+### Sales Agent
+Role:
+- DM qualified leads with a lead magnet and app link, then track offer outcomes.
+
+Qualification policy:
+- DM only when lead score threshold is met (recommended default: `>= 70`).
+- Enforce cooldown and suppression before queueing any DM.
+
+Output:
+- action: send_offer_dm | follow_up | skip
+- lead_id
+- message_text
+- offer metadata
+
 ---
 
 ## 7) Services (non-LLM)
 
 ### Execution Service
-- Publishes posts/replies to X API.
+- Publishes posts/replies and sends DMs via X API.
 - Applies retries/backoff/rate controls.
 - Updates queue status and errors.
 
@@ -252,14 +291,18 @@ Base: `/api/`
 - leads
 - contacts
 - activities
+- offers
+- offer-events
 
 ### Action endpoints
 - `POST /api/agents/autopilot/run-once`
 - `POST /api/agents/content/generate-draft`
 - `POST /api/agents/engagement/discover`
 - `POST /api/agents/safety/check`
-- `POST /api/queue/posts/{id}/approve`
-- `POST /api/queue/replies/{id}/approve`
+- `POST /api/agents/sales/process-qualified`
+- `POST /api/offers/send-qualified`
+- `POST /api/offers/{id}/follow-up`
+- `POST /api/leads/{id}/suppress`
 - `POST /api/queue/posts/{id}/cancel`
 - `POST /api/queue/replies/{id}/cancel`
 
@@ -267,8 +310,10 @@ Base: `/api/`
 - `GET /api/dashboard/summary`
   - posts_today
   - replies_today
+  - dms_sent_today
   - queued_count
   - lead_counts_by_status
+  - offer_counts_by_status
   - top_posts_recent
 
 ### Security rules
@@ -283,9 +328,9 @@ Base: `/api/`
 - Dashboard
   - KPI cards, recent agent runs, recent failures
 - Content Board
-  - columns: draft/in_review/approved/scheduled/published
+  - columns: draft/scheduled/published/rejected
 - Queue View
-  - pending posts/replies + approve/reject
+  - pending posts/replies/offers + cancel/retry
 - CRM View
   - leads table + contact detail + activity timeline
 - Settings
@@ -313,18 +358,18 @@ Base: `/api/`
 ### Backend tests
 - Auth required on all endpoints.
 - User scoping for list/retrieve/update/delete.
-- Queue transitions (approve/cancel/post success/failure).
+- Queue transitions (cancel/post success/failure + DM send/follow-up/suppression).
 - GrowthPolicy limits enforcement.
 - Safety block behavior.
 
 ### Integration tests
 - Autopilot run-once -> expected queue side effects.
-- Execution service publishes and updates status.
+- Execution service publishes, sends DMs, and updates status.
 - Metrics snapshot job writes snapshots.
 
 ### Smoke tests
 - End-to-end happy path:
-  - generate draft -> approve -> schedule -> publish -> metrics visible
+  - generate draft -> schedule -> publish -> lead qualifies -> DM offer sent -> metrics visible
 
 ---
 
@@ -333,7 +378,7 @@ Base: `/api/`
 1. System can run daily without manual prompting.
 2. At least one post and one reply can be published from queue.
 3. Leads are created and visible in CRM workflow.
-4. Dashboard shows post/reply/lead KPIs from real stored data.
+4. Dashboard shows post/reply/lead/offer KPIs from real stored data.
 5. Safety agent can block risky content and record reason.
 6. Policy limits and kill switch are enforced.
 7. Critical tests pass in CI.
@@ -353,7 +398,7 @@ Base: `/api/`
 - queue actions
 
 ### Phase C (Agentic MVP)
-- implement 4 agents + scheduler + execution
+- implement 5 agents + scheduler + execution
 - metrics collector + dashboard summary
 - reliability hardening
 

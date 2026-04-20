@@ -5,6 +5,7 @@
 - `content-agent.md`
 - `engagement-agent.md`
 - `safety-agent.md`
+- `sales-agent.md`
 
 ## Phase 2
 - `optimization-agent.md`
@@ -12,7 +13,7 @@
 - `strategy-agent.md`
 
 ## Phase 3
-- `sales-agent.md`
+- No additional agent required for MVP goal.
 
 ## Notes
 - Agent specs define decision logic and structured outputs.

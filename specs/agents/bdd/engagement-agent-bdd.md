@@ -39,3 +39,19 @@ When output is returned
 Then output.summary is present
 And output.actions is an array of structured action objects
 ```
+
+## Scenario 6: Exclude likes from DM qualification
+```gherkin
+Given an interaction is a like only
+When Engagement Agent scores DM eligibility
+Then the candidate is not DM eligible
+And no DM candidate action is emitted
+```
+
+## Scenario 7: Qualify DM candidates from reply, mention, or follow
+```gherkin
+Given interactions include reply, mention, or follow signals
+When Engagement Agent scores candidates
+Then candidates above threshold are marked DM eligible
+And threshold uses the configured score floor
+```

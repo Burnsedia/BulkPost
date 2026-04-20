@@ -9,11 +9,17 @@ MVP
 ## Objective
 Generate meaningful engagement and create qualified leads.
 
+## Qualification Policy
+- Count only `reply`, `mention`, and `follow` interactions for DM qualification.
+- Track likes for analytics only; do not use likes to qualify DM candidates.
+- Default DM qualification score threshold: `>= 70`.
+
 ## Inputs
 - GrowthPolicy thresholds
 - Topic/campaign signals
 - Existing interaction history
 - Pending reply capacity
+- Recent interaction types (reply/mention/follow)
 
 ## Output Contract
 ```json
