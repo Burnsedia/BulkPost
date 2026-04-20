@@ -3,8 +3,9 @@
 ## 1) Purpose
 
 Build a focused MVP that combines:
-- CMS for social content operations (draft -> schedule -> publish -> measure)
+- CMS for social content operations (generate -> safety check -> queue -> publish -> measure)
 - CRM for social lead operations (discover -> qualify -> engage -> offer -> track)
+
 
 Primary channel for MVP: **X/Twitter only**.
 
@@ -29,10 +30,17 @@ Primary channel for MVP: **X/Twitter only**.
 
 ### Included
 - Authenticated single-user workspace
+- X OAuth sign-in and account connection
+- Token lifecycle management (store, refresh, reconnect)
 - Content pipeline:
-  - Draft generation
+  - Autonomous content generation
+  - Automatic safety check and queueing
   - Scheduling queue
   - Publish and error handling
+- Style learning pipeline:
+  - Initial tweet history import after connect
+  - Ongoing tweet sync for style updates
+  - Style profile generation for content/reply personalization
 - CRM pipeline:
   - Lead capture from reply/mention/follow interactions
   - Lead qualification and scoring
@@ -98,18 +106,45 @@ Autopilot Agent
 - is_active (bool)
 - created_at, updated_at
 
-#### ContentDraft
+#### ContentItem
 - id
 - user (FK)
 - campaign (FK nullable)
 - source_prompt (FK Prompt nullable)
 - title (optional)
 - body
-- status (idea | draft | scheduled | published | rejected)
+- status (generated | safety_checked | queued | published | blocked | failed)
 - risk_score (float)
 - scheduled_for (datetime nullable)
 - linked_post (FK Post nullable)
 - created_at, updated_at
+
+#### ImportedTweet
+- id
+- user (FK)
+- channel (x)
+- external_tweet_id
+- text
+- posted_at
+- like_count (int default 0)
+- reply_count (int default 0)
+- repost_count (int default 0)
+- quote_count (int default 0)
+- imported_at
+
+#### StyleProfile
+- id
+- user (FK)
+- source_window_days (int)
+- samples_count (int)
+- avg_length_chars (int)
+- hook_patterns (json)
+- cta_patterns (json)
+- tone_markers (json)
+- banned_phrases (json)
+- style_rules (text)
+- version (int)
+- updated_at
 
 #### Lead
 - id
@@ -190,17 +225,19 @@ Output:
 
 ### Content Agent
 Role:
-- Generate content drafts aligned to campaign/prompt variant.
+- Generate publish-ready content candidates aligned to campaign/prompt variant.
 
 Input:
 - Prompt/SystemPrompt variant
 - Campaign context
 - Recent content constraints
+- StyleProfile
 
 Output:
 - text/body
 - category/tag
 - optional hooks
+- style profile trace metadata
 
 ### Engagement Agent
 Role:
@@ -265,6 +302,16 @@ Output:
 - Honors min intervals and daily caps.
 - Stops all actions if kill_switch=true.
 
+### Identity and Sync Service
+- Handles X OAuth connect/disconnect and token refresh.
+- Imports historical tweets on initial account connect.
+- Runs periodic sync for new tweets and profile metadata.
+
+### Style Profiler Service
+- Builds StyleProfile from ImportedTweet history.
+- Updates style profile on schedule (e.g., daily/weekly).
+- Exposes style constraints to Content and Engagement agents.
+
 ### Metrics Collector Service
 - Pulls post-level metrics snapshots.
 - Stores engagement trend points.
@@ -277,6 +324,7 @@ Output:
 Base: `/api/`
 
 ### Existing resources
+- auth
 - system-prompts
 - prompts
 - posts
@@ -286,8 +334,10 @@ Base: `/api/`
 - daily-usage
 
 ### New resources
+- imported-tweets
+- style-profiles
 - campaigns
-- content-drafts
+- content-items
 - leads
 - contacts
 - activities
@@ -295,8 +345,13 @@ Base: `/api/`
 - offer-events
 
 ### Action endpoints
+- `GET /api/auth/x/login`
+- `GET /api/auth/x/callback`
+- `POST /api/auth/x/disconnect`
+- `POST /api/import/x/history`
+- `POST /api/style-profiles/rebuild`
 - `POST /api/agents/autopilot/run-once`
-- `POST /api/agents/content/generate-draft`
+- `POST /api/agents/content/generate-content`
 - `POST /api/agents/engagement/discover`
 - `POST /api/agents/safety/check`
 - `POST /api/agents/sales/process-qualified`
@@ -327,8 +382,10 @@ Base: `/api/`
 
 - Dashboard
   - KPI cards, recent agent runs, recent failures
-- Content Board
-  - columns: draft/scheduled/published/rejected
+- Onboarding
+  - connect X account, import status, sync status, style profile status, autopilot toggle
+- Automation Control Center
+  - queue health, next run times, policy limits, kill switch, failures/retries
 - Queue View
   - pending posts/replies/offers + cancel/retry
 - CRM View
@@ -358,30 +415,36 @@ Base: `/api/`
 ### Backend tests
 - Auth required on all endpoints.
 - User scoping for list/retrieve/update/delete.
+- OAuth callback and token persistence behavior.
+- Historical import idempotency and dedupe behavior.
+- Style profile build/update contract.
 - Queue transitions (cancel/post success/failure + DM send/follow-up/suppression).
 - GrowthPolicy limits enforcement.
 - Safety block behavior.
 
 ### Integration tests
+- X connect -> import -> style profile build pipeline.
 - Autopilot run-once -> expected queue side effects.
 - Execution service publishes, sends DMs, and updates status.
 - Metrics snapshot job writes snapshots.
 
 ### Smoke tests
 - End-to-end happy path:
-  - generate draft -> schedule -> publish -> lead qualifies -> DM offer sent -> metrics visible
+  - connect X -> import history -> build style profile -> generate content -> publish -> lead qualifies -> DM offer sent -> metrics visible
 
 ---
 
 ## 12) Acceptance Criteria (Definition of Done)
 
 1. System can run daily without manual prompting.
-2. At least one post and one reply can be published from queue.
-3. Leads are created and visible in CRM workflow.
-4. Dashboard shows post/reply/lead/offer KPIs from real stored data.
-5. Safety agent can block risky content and record reason.
-6. Policy limits and kill switch are enforced.
-7. Critical tests pass in CI.
+2. X OAuth connect, tweet import, and style profile build work end to end.
+3. Generated content and replies consistently use StyleProfile constraints.
+4. User can sign up, connect X once, and run hands-off without manual social actions.
+5. Leads are created and visible in CRM workflow.
+6. Dashboard shows post/reply/lead/offer KPIs from real stored data.
+7. Safety agent can block risky content and record reason.
+8. Policy limits and kill switch are enforced.
+9. Critical tests pass in CI.
 
 ---
 
@@ -390,11 +453,13 @@ Base: `/api/`
 ### Phase A (Foundation)
 - Fix startup/model issues
 - auth + scoped APIs
+- X OAuth and token storage
 - baseline tests
 
 ### Phase B (Core CRM+CMS)
 - add new models + CRUD endpoints
-- content board + CRM screens
+- tweet history import + style profile generation
+- automation control center + CRM screens
 - queue actions
 
 ### Phase C (Agentic MVP)
