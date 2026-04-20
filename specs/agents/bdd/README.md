@@ -7,6 +7,7 @@ Files:
 - `content-agent-bdd.md`
 - `engagement-agent-bdd.md`
 - `safety-agent-bdd.md`
+- `style-profiler-agent-bdd.md`
 - `optimization-agent-bdd.md`
 - `trend-agent-bdd.md`
 - `strategy-agent-bdd.md`

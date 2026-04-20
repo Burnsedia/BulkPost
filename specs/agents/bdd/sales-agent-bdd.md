@@ -4,7 +4,7 @@
 ```gherkin
 Given qualified leads with interaction history exist
 When Sales Agent evaluates pipeline actions
-Then output.actions contains score, dm_draft, or follow_up actions
+Then output.actions contains score, send_offer_dm, or follow_up actions
 And each action references a lead_id
 ```
 
