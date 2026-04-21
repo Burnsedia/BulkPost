@@ -19,6 +19,15 @@ Non-goals:
 
 ## 2. Core Entgities
 
+### Category
+
+- id
+- title ( String )
+- slug 
+- description
+- datatime 
+- parent
+
 ### Post
 
 - id
@@ -34,10 +43,11 @@ Non-goals:
 - StatusName/Ttile(string)
 
 ### SchedlutleObject
-
+- post 
 - schedulted_time (datetime)
-  
-<!-- TODO:make something like this per platfrom -->
+
+<!-- TODO:maybe refactor this to be a PlatforomPost class that is a Parent -->
+
 ### TwitterPost
 
 - twitterID
@@ -65,7 +75,7 @@ Non-goals:
 - id
 - post(FK)
 - contact(FK)
-this should be a django taggit tag
+<!--NOTE: this should be a django taggit tag -->
 - type (enum: reply, like, retweet)
 
 ### LeadStatus
@@ -78,5 +88,4 @@ this should be a django taggit tag
 - id
 - platform (enum of platfoms names maybe a choice class)
 - status (FK LeadStatus)
-- status (enum new, contacted, qulified, converted)
 - contact (one2many contact)
