@@ -1,0 +1,14 @@
+# -----------------------------
+# Python
+# -----------------------------
+*.pyc
+__pycache__/
+
+**/backend/**/migrations/*
+!**/backend/**/migrations/__init__.py
+
+db.sqlite3
+
+*.log
+
+.env
