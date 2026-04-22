@@ -23,9 +23,9 @@ Non-goals:
 
 - id
 - title ( String )
-- slug 
+- slug
 - description
-- datatime 
+- datatime
 - parent
 
 ### Post
@@ -43,9 +43,9 @@ Non-goals:
 - StatusName/Ttile(string)
 
 ### SchedlutleObject
-- post 
-- schedulted_time (datetime)
 
+- post
+- schedulted_time (datetime)
 <!-- TODO:maybe refactor this to be a PlatforomPost class that is a Parent -->
 
 ### TwitterPost
