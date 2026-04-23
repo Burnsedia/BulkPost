@@ -89,3 +89,9 @@ Non-goals:
 - platform (enum of platfoms names maybe a choice class)
 - status (FK LeadStatus)
 - contact (one2many contact)
+
+
+--- 
+
+When someone likes a post 
+You get
