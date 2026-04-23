@@ -52,7 +52,7 @@ class TwitterPost(models.Model):
         related_name="SchedlutledPost"
     )
 
-class TwitterPost(models.Model):
+class LinkedInPostPost(models.Model):
     linkedinID = models.CharField(max_length=50)
     post = models.ForeignKey(
         Post, 
@@ -77,3 +77,23 @@ class Contact(models.Models):
     username = models.CharField(max_length=50)
     platform = models.CharField(max_length=50)
     bio = models.TextField()
+
+class LeadStatus(models.Models):
+    title = models.CharField(max_length=50)
+
+class Lead(models.Models):
+    platform = models.CharField(max_length=50)
+    status = models.ForeignKey(
+        LeadStatus,
+        null=True,
+        blank=True,
+        related_name="LeadStutus"
+    )
+    contact =  models.ForeignKey(
+        Contact, 
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="contacts"
+    )
+
