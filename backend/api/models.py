@@ -1,6 +1,11 @@
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
+from django.utils import choices, timezone
+
+class PlatformChoice(models.TextField)
+    TWITTER = "twitter", "Twitter"
+    LINKEDIN = "linkedin", "LinkedIn"
+    THREADS = "threads", "Threads"
 
 
 class Category(models.Model):
@@ -27,7 +32,6 @@ class Post(models.Model):
         blank=True,
         related_name="PostCategory"
     )
-)
 
 class PostStatus(models.Model):
     title = models.CharField()
@@ -75,14 +79,13 @@ class ThreadsPostPost(models.Model):
 #TODO: create text choice models or a plateform model
 class Contact(models.Models):
     username = models.CharField(max_length=50)
-    platform = models.CharField(max_length=50)
+    platform = models.CharField(max_length=50,choices=PlatformChoice.choices default=PlatformChoice.TWITTER)
     bio = models.TextField()
 
 class LeadStatus(models.Models):
     title = models.CharField(max_length=50)
 
 class Lead(models.Models):
-    platform = models.CharField(max_length=50)
     status = models.ForeignKey(
         LeadStatus,
         null=True,
