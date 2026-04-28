@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import choices, timezone
 
-class PlatformChoice(models.TextField)
+class PlatformChoice(models.TextChoices):
     TWITTER = "twitter", "Twitter"
     LINKEDIN = "linkedin", "LinkedIn"
     THREADS = "threads", "Threads"
