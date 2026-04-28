@@ -77,15 +77,15 @@ class ThreadsPostPost(models.Model):
     )
 
 #TODO: create text choice models or a plateform model
-class Contact(models.Models):
+class Contact(models.Model):
     username = models.CharField(max_length=50)
-    platform = models.CharField(max_length=50,choices=PlatformChoice.choices default=PlatformChoice.TWITTER)
+    platform = models.CharField(max_length=50,choices=PlatformChoice.choices, default=PlatformChoice.TWITTER)
     bio = models.TextField()
 
-class LeadStatus(models.Models):
+class LeadStatus(models.Model):
     title = models.CharField(max_length=50)
 
-class Lead(models.Models):
+class Lead(models.Model):
     status = models.ForeignKey(
         LeadStatus,
         null=True,
