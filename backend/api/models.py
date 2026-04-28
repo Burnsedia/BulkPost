@@ -7,6 +7,20 @@ class PlatformChoice(models.TextChoices):
     LINKEDIN = "linkedin", "LinkedIn"
     THREADS = "threads", "Threads"
 
+#TODO: Make a Persona class that relates to  
+#TODO: Need to reactitect the Posts
+#TODO: Need to Brind Back the Old Prompt Models ( SystemPrompt and UserPrompt )
+#TODO: Need a Agent Model
+#TODO: Add Reddit Support
+
+#NOTE: Persona needs demagrafic data
+#NOTE: Persona needs Location Data 
+#NOTE: Persona needs income rang data
+#NOTE: Persona needs interests data
+#NOTE: Persona needs Education Level  
+#NOTE: Persona needs what social platforms they use 
+#NOTE: Persona needs  
+#NOTE:  
 
 class Category(models.Model):
     title = models.CharField()
