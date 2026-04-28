@@ -88,6 +88,7 @@ class LeadStatus(models.Model):
 class Lead(models.Model):
     status = models.ForeignKey(
         LeadStatus,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="LeadStutus"
