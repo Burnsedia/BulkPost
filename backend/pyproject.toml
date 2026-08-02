@@ -16,7 +16,7 @@ dependencies = [
     "djangorestframework==3.16.1",
     "djangorestframework-simplejwt==5.5.1",
     "djoser==2.3.3",
-    "idna==3.11",
+    "idna==3.15",
     "oauthlib==3.3.1",
     "pycparser==2.23",
     "pydantic>=2.13.0",
